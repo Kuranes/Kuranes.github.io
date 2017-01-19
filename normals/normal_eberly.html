@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+
+	<canvas id="a" width="256" height="256"></canvas>
+	<canvas id="b" width="256" height="256"></canvas>
+	<canvas id="c" width="256" height="256"></canvas>
+	<canvas id="d" width="256" height="256"></canvas>
+	<script>
+    var canvasA = document.getElementById('a');
+     var contextA = canvasA.getContext('2d');
+     var dataA;
+
+    var canvasB = document.getElementById('b');
+     var contextB = canvasB.getContext('2d');
+     var dataB;
+
+    var canvasC = document.getElementById('c');
+     var contextC = canvasC.getContext('2d');
+     var dataC;
+
+    var canvasD = document.getElementById('d');
+     var contextD = canvasD.getContext('2d');
+     var dataD;
+
+
+	 function stopWorker() {
+		   worker.terminate();
+	 }
+
+     function messageHandlerA(e) {
+         dataB = contextB.getImageData(0,0,canvasB.width, canvasB.height);
+         dataB.data.set(e.data);
+		 contextB.putImageData( dataB, 0, 0 );
+		 worker.terminate();
+         worker2.postMessage(dataB);
+	 }
+
+     function messageHandlerB(e) {
+         dataC = contextC.getImageData(0,0,canvasB.width, canvasB.height);
+         dataC.data.set(e.data);
+		 contextC.putImageData( dataC, 0, 0 );
+		 worker2.terminate();
+         worker3.postMessage({a : dataA.data, b : dataC.data, length: canvasB.width*canvasB.height});
+	 }
+	 
+     function messageHandlerC(e) {
+         dataD = contextD.getImageData(0,0,canvasB.width, canvasB.height);
+         dataD.data.set(e.data);
+		 contextD.putImageData( dataD, 0, 0 );
+		 worker3.terminate();
+	 }
+     
+	 function errorHandler(e) {
+		 console.warn(e.message, e);
+	 }
+
+     var worker = new Worker("n2h_eberly.js");
+     worker.addEventListener("message", messageHandlerA, true);
+     worker.addEventListener("error", errorHandler, true);
+
+	 var worker2 = new Worker("normalWorker.js");
+     worker2.addEventListener("message", messageHandlerB, true);
+     worker2.addEventListener("error", errorHandler, true);
+
+	 var worker3 = new Worker("diff.js");
+     worker3.addEventListener("message", messageHandlerC, true);
+     worker3.addEventListener("error", errorHandler, true);
+
+
+     // load image from data url
+     var imageObj = new Image();
+     imageObj.onload = function() {
+         contextA.drawImage(this, 0, 0);
+         dataA = contextA.getImageData(0,0,canvasA.width, canvasA.height);
+         worker.postMessage(dataA);
+    };
+
+    imageObj.src = "normal4k_detail256.png";
+
+	</script>
+
+</body>
+</html>

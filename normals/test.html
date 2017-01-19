@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+
+	<canvas id="a" width="256" height="256"></canvas>
+	<canvas id="b" width="256" height="256"></canvas>
+	<canvas id="c" width="256" height="256"></canvas>
+    <canvas id="d" width="256" height="256"></canvas>
+
+	<script>
+    var canvasA = document.getElementById('a');
+     var contextA = canvasA.getContext('2d');
+     var dataA;
+
+    var canvasD = document.getElementById('d');
+    var contextD = canvasD.getContext('2d');
+    var dataD;
+
+	 function stopWorker() {
+		   worker.terminate();
+	 }
+
+     function messageHandlerC(e) {
+         dataD = contextD.getImageData(0,0,canvasD.width, canvasD.height);
+         dataD.data.set(e.data);
+		 contextD.putImageData( dataD, 0, 0 );
+		 worker3.terminate();
+	 }
+	 function errorHandler(e) {
+		 console.warn(e.message, e);
+	 }
+
+	 var worker3 = new Worker("n2h.js");
+     worker3.addEventListener("message", messageHandlerC, true);
+     worker3.addEventListener("error", errorHandler, true);
+
+
+     // load image from data url
+     var imageObj = new Image();
+     imageObj.onload = function() {
+         contextA.drawImage(this, 0, 0);
+         dataA = contextA.getImageData(0,0,canvasA.width, canvasA.height);
+         worker3.postMessage(dataA);
+    };
+
+    imageObj.src = "Cerberus_N_256.png";
+
+	</script>
+
+</body>
+</html>

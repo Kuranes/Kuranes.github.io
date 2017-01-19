@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body id="dropbox">
+
+    <script src="main_float.js"></script>
+	<script>
+        var dropbox;
+        dropbox = document.getElementById("dropbox");
+        dropbox.addEventListener("drop", drop, false);
+        dropbox.addEventListener("dragenter", dragenter, false);
+        dropbox.addEventListener("dragover", dragover, false);
+        function dragenter(e) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+
+        function dragover(e) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+        function drop(e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          var dt = e.dataTransfer;
+          var files = dt.files;
+
+          handleFiles(files);
+        }
+
+        window.onload = function () {
+            main( "normal4k_detail256.png" );
+        };
+	</script>
+
+</body>
+</html>

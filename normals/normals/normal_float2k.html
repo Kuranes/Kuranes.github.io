@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+
+	<canvas id="a" width="2048" height="2048"></canvas>
+	<canvas id="b" width="2048" height="2048"></canvas>
+	<canvas id="c" width="2048" height="2048"></canvas>
+	<canvas id="d" width="2048" height="2048"></canvas>
+	<script>
+    var canvasA = document.getElementById('a');
+     var contextA = canvasA.getContext('2d');
+     var dataA;
+
+    var canvasB = document.getElementById('b');
+     var contextB = canvasB.getContext('2d');
+     var dataB;
+
+    var canvasC = document.getElementById('c');
+     var contextC = canvasC.getContext('2d');
+     var dataC;
+
+    var canvasD = document.getElementById('d');
+     var contextD = canvasD.getContext('2d');
+     var dataD;
+
+     var floatData;
+     
+	 function stopWorker() {
+		   worker.terminate();
+	 }
+
+     function messageHandlerA(e) {
+         dataB = contextB.getImageData(0,0,canvasB.width, canvasB.height);
+         var out = e.data;
+         
+         var out2 = new Uint8ClampedArray(canvasB.width * canvasB.height * 4);
+   
+        var min = 100000.0;
+        var max = -100000.0;
+        for (var i = 0; i < out.length; i++) {
+            max = Math.max(out[i], max);
+            min = Math.min(out[i], min);
+        }
+        console.log(min, max, max - min);
+        var iRGB = 0;
+        var scale;
+
+        scale = 256.0 / (max - min);
+        //scale = 256.0 / (max);    
+        var c;
+        c = 0.0;
+        for (i = 0; i < out.length; i++) {
+            iRGB = i * 4;
+            var lum = out[i];
+            lum = lum - min;
+            //lum = ((lum ) / (max - min));
+            //lum = lum  / max;
+            //lum = lum  + min / max;
+            lum *= scale;
+            lum += c;
+            out2[iRGB + 0] = lum;
+            out2[iRGB + 1] = lum;
+            out2[iRGB + 2] = lum;
+            out2[iRGB + 3] = 256;
+        }
+    
+         dataB.data.set(out2);
+		 contextB.putImageData( dataB, 0, 0 );
+		 worker.terminate();
+         
+         worker2.postMessage({data: e.data, width: canvasB.width, height: canvasB.height});
+	 }
+
+     function messageHandlerB(e) {
+         dataC = contextC.getImageData(0,0,canvasB.width, canvasB.height);
+         dataC.data.set(e.data);
+		 contextC.putImageData( dataC, 0, 0 );
+		 worker2.terminate();
+         worker3.postMessage({a : dataA.data, b : dataC.data, length: canvasB.width*canvasB.height});
+	 }
+     
+     function messageHandlerC(e) {
+         dataD = contextD.getImageData(0,0,canvasB.width, canvasB.height);
+         dataD.data.set(e.data);
+		 contextD.putImageData( dataD, 0, 0 );
+		 worker3.terminate();
+	 }
+	 
+	 function errorHandler(e) {
+		 console.warn(e.message, e);
+	 }
+
+     var worker = new Worker("n2h_float.js");
+     worker.addEventListener("message", messageHandlerA, true);
+     worker.addEventListener("error", errorHandler, true);
+
+	 var worker2 = new Worker("normalWorkerFloat.js");
+     worker2.addEventListener("message", messageHandlerB, true);
+     worker2.addEventListener("error", errorHandler, true);
+
+	 var worker3 = new Worker("diff.js");
+     worker3.addEventListener("message", messageHandlerC, true);
+     worker3.addEventListener("error", errorHandler, true);
+
+     // load image from data url
+     var imageObj = new Image();
+     imageObj.onload = function() {
+         contextA.drawImage(this, 0, 0);
+         dataA = contextA.getImageData(0,0,canvasA.width, canvasA.height);
+         worker.postMessage(dataA);
+    };
+
+    imageObj.src = "normal2k.png";
+
+	</script>
+
+</body>
+</html>
