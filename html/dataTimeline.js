@@ -95,7 +95,7 @@ var dataTime = [
 }]
 
 var str = '';
-str += '<div class="cd-timeline-block">';
+str += '<div class="cd-timeline-block" id="%id%">';
 
 str += '<div class="cd-timeline-img cd-picture">';
 
@@ -103,7 +103,7 @@ str += '<a class="lightbox" href="#%id%">';
 str += '<img src="%img%" alt="Picture">';
 str += '</a> ';
 
-str += '<div class="lightbox-target" id="%id%">';
+str += '<div class="lightbox-target" >';
 str += '<img src="%img%" alt="Picture"> ';
 str += '<a class="lightbox-close" href="#"></a></div>';
 
