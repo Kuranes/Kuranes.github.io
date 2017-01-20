@@ -1,6 +1,10 @@
 ( function () {
     'use strict';
 
+    
+    // TODO align camera and mesh "center"
+    // multiple cubemap + parallax correction
+    
     var ExampleOSGJS = window.ExampleOSGJS;
     var P = window.P;
     var OSG = window.OSG;
@@ -15,7 +19,10 @@
 
         this._config = {
             live: false,
-            env: false
+            env: false,
+            reflection: true,
+            refraction: false,
+            anim: true
         };
 
         this._shaderNames = [
@@ -78,18 +85,17 @@
     Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
 
         getReflectionShader: function () {
-
-            return this.createShader( 'basicVS.glsl', [], 'reflection.glsl', [] );
+            
+            var defines = [];
+            
+            if ( this._config[ 'live' ] )  defines.push('#define LIVE 1');
+            if ( this._config[ 'reflection' ] )  defines.push('#define REFLECTIONS 1');
+            if ( this._config[ 'refraction' ] )  defines.push('#define REFRACTIONS 1');
+            
+            return this.createShader( 'basicVS.glsl', [], 'reflection.glsl', defines );
+            
 
         },
-
-        getLiveReflectionShader: function () {
-
-            return this.createShader( 'basicVS.glsl', [], 'reflection.glsl', ['#define LIVE 1'] );
-
-        },
-
-
         getShaderBackground: function () {
             
             return this.createShader( 'basicVS.glsl', [], 'cubemap.glsl', [] );
@@ -97,7 +103,9 @@
         },
         getShaderLiveBackground: function () {
 
-            return this.createShader( 'basicVS.glsl', [], 'cubemap.glsl', ['#define LIVE 1'] );
+            var defines = [];            
+            defines.push('#define LIVE 1');
+            return this.createShader( 'basicVS.glsl', [], 'cubemap.glsl', defines );
 
         },
 
@@ -253,30 +261,50 @@
             return cubeTexture;
 
         },
-
-        enableReflections: function () {
+        
+        enableLiveCubemap: function () {
 
             if (this._config['env']){
                 this.enable360();
             }
-            this._config[ 'live' ] = this._config[ 'live' ] ? false : true;
             
+            this._config[ 'live' ] = this._config[ 'live' ] ? false : true;            
+            this._model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
+                
             if ( this._config[ 'live' ] ) {
 
                 this._model.getOrCreateStateSet().setTextureAttributeAndModes( 0, this._dynamicTextureCubeMap );
-                this._model.getOrCreateStateSet().setAttributeAndModes( this.getLiveReflectionShader() );
-
                 this._sceneRoot.addChild( this._cameras360Node );
 
 
             } else {
 
                 this._model.getOrCreateStateSet().setTextureAttributeAndModes( 0, this._textureCubeMap );
-                this._model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
-
                 this._sceneRoot.removeChild( this._cameras360Node );
 
             }
+
+
+        },
+        enableRefractions: function () {
+
+            if (this._config['env']){
+                this.enable360();
+            }
+            
+            this._config[ 'refraction' ] = this._config[ 'refraction' ] ? false : true;   
+            this._model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
+
+
+        },
+        enableReflections: function () {
+
+            if (this._config['env']){
+                this.enable360();
+            }
+            
+            this._config[ 'reflection' ] = this._config[ 'reflection' ] ? false : true;   
+            this._model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
 
 
         },
@@ -312,19 +340,24 @@
             var gui = new window.dat.GUI();
 
             // ui
+            gui.add( this, 'enableLiveCubemap' );
             gui.add( this, 'enableReflections' );
+            gui.add( this, 'enableRefractions' );
             gui.add( this, 'enable360' );
+            gui.add( this._config, 'anim' );
 
         },
 
         update: function ( /*node, nv*/) {
 
+            if (!this._config['anim']) return true;
+            
             this._time = ( this._time + 1 ) % 360;
             var rotRad = ( this._time * 0.0174533 ) * 0.001;
             
             var rotate = osg.mat4.fromRotation( osg.mat4.create(), -Math.PI * rotRad, [ 0, 0, 1 ] );
             osg.mat4.mul( this._spheres.getMatrix(), rotate, this._spheres.getMatrix() );
-
+            
             return true;
 
         },
@@ -359,7 +392,10 @@
             for ( var i = 0; i < 25; i++ ) {
 
                 sphereNode = new osg.MatrixTransform();
-                sphereNode.setMatrix( osg.mat4.fromTranslation( osg.mat4.create(), [ -scale * Math.random() + scale * 0.5, -scale * Math.random() + scale * 0.5, -scale * Math.random() + scale * 0.5 ] ) );
+                sphereNode.setMatrix( osg.mat4.fromTranslation( osg.mat4.create(), 
+                    [ -scale * Math.random() + scale * 0.5, 
+                    -scale * Math.random() + scale * 0.5, 
+                    -scale * Math.random() + scale * 0.5 ] ) );
 
                 var material = new osg.Material();
                 material.setDiffuse( [ Math.random(), Math.random(), Math.random(), 1.0 ] );
@@ -375,7 +411,10 @@
             sceneRoot.addUpdateCallback( this );
 
             var model = this.getModel();
-            model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
+            var ss = model.getOrCreateStateSet()
+            ss.setAttributeAndModes( this.getReflectionShader() );             
+            ss.setRenderingHint( 'TRANSPARENT_BIN' );
+            ss.setAttributeAndModes( new osg.BlendFunc( 'ONE', 'ONE_MINUS_SRC_ALPHA' ) );
             this._model = model;
 
             P.all( [
@@ -431,20 +470,13 @@
                 this._dynamicTextureCubeMap = dynamicTextureCubeMap;
 
 
-                if ( this._config[ 'live' ] ) {
-
+                model.getOrCreateStateSet().addUniform( osg.Uniform.createInt1( 0, 'Texture0' ) );
+                model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
+                
+                if ( this._config[ 'live' ] ) {                    
                     model.getOrCreateStateSet().setTextureAttributeAndModes( 0, dynamicTextureCubeMap );
-                    model.getOrCreateStateSet().addUniform( osg.Uniform.createInt1( 0, 'Texture0' ) );
-                    model.getOrCreateStateSet().setAttributeAndModes( this.getLiveReflectionShader() );
-
-
                 } else {
-
                     model.getOrCreateStateSet().setTextureAttributeAndModes( 0, textureCubeMap );
-                    model.getOrCreateStateSet().addUniform( osg.Uniform.createInt1( 0, 'Texture0' ) );
-                    model.getOrCreateStateSet().setAttributeAndModes( this.getReflectionShader() );
-
-
                 }
 
                 this.reflectedScene = reflScene;
