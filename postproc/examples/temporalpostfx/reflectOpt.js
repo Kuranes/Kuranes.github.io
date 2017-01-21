@@ -60,28 +60,22 @@
             osg.Matrix.copy( projection, this._cameraRTT.getProjectionMatrix() );
             osg.Matrix.copy( view, this._cameraRTT.getViewMatrix() );
 
-            osg.Matrix.copy( projection, this._cameraRTT1.getProjectionMatrix() );
-            osg.Matrix.copy( view, this._cameraRTT1.getViewMatrix() );
-
             osg.Matrix.copy( projection, this._cameraRTT2.getProjectionMatrix() );
             osg.Matrix.copy( view, this._cameraRTT2.getViewMatrix() );
 
-            osg.Matrix.copy( projection, this._cameraRTT3.getProjectionMatrix() );
-            osg.Matrix.copy( view, this._cameraRTT3.getViewMatrix() );
 
         },
         updateTransNode: function ( x ) {
+            osg.Matrix.makeRotate( x, 0, 0, 1, this._transNode1.getMatrix() );
             osg.Matrix.makeRotate( x, 0, 0, 1, this._transNode2.getMatrix() );
-            osg.Matrix.makeRotate( x, 0, 0, 1, this._transNode3.getMatrix() );
         },
 
         createScene: function () {
-
-            /// DEPTH
+ 
+ /// DEPTH
             var result = this._helper.commonScene( this._helper._rttSize, osg.Camera.PRE_RENDER, this._helper._model, false );
             this._commonNode = result[ 0 ];
             this._sceneTexture = result[ 1 ];
-            this._sceneTexture.preventDiffuseAcc = true;
             this._cameraRTT = result[ 2 ];
             this._transNode = result[ 3 ];
 
@@ -90,41 +84,23 @@
             this._cameraRTT.removeChild( this._helper.backGround );
             this._cameraRTT.setClearColor( [ 0.0, 0.0, 0.0, 0.0 ] );
 
-            // NORMAL
-            var result1 = this._helper.commonScene( this._helper._rttSize, osg.Camera.PRE_RENDER, this._helper._model, false );
+            // MODEL ONLY, NORMAL RENDER
+            var result1 = this._helper.commonScene( this._helper._rttSize, osg.Camera.PRE_RENDER, this._helper._model._userData[ 'model' ], false );
             this._commonNode1 = result1[ 0 ];
             this._sceneTexture1 = result1[ 1 ];
-            this._sceneTexture1.preventDiffuseAcc = true;
             this._cameraRTT1 = result1[ 2 ];
             this._transNode1 = result1[ 3 ];
 
-            this._cameraRTT1.setCullCallback( new CullCallback( this ) );
 
-            this._cameraRTT1.removeChild( this._helper.backGround );
-            this._cameraRTT1.setClearColor( [ 0.0, 0.0, 0.0, 0.0 ] );
-
-            // MODEL ONLY, NORMAL RENDER
-            var result2 = this._helper.commonScene( this._helper._rttSize, osg.Camera.PRE_RENDER, this._helper._model._userData[ 'model' ], false );
+            // PLANE, REFLECTION
+            var result2 = this._helper.commonScene( this._helper._rttSize, osg.Camera.PRE_RENDER, this._helper._model._userData[ 'ground' ], false );
             this._commonNode2 = result2[ 0 ];
             this._sceneTexture2 = result2[ 1 ];
             this._sceneTexture2.preventDiffuseAcc = true;
             this._cameraRTT2 = result2[ 2 ];
             this._transNode2 = result2[ 3 ];
 
-
-            // PLANE, REFLECTION
-            var result3 = this._helper.commonScene( this._helper._rttSize, osg.Camera.PRE_RENDER, this._helper._model._userData[ 'ground' ], false );
-            this._commonNode3 = result3[ 0 ];
-            this._sceneTexture3 = result3[ 1 ];
-            this._sceneTexture3.preventDiffuseAcc = true;
-            this._cameraRTT3 = result3[ 2 ];
-            this._transNode3 = result3[ 3 ];
-
-            this._cameraRTT3.removeChild( this._helper.backGround );
-            this._cameraRTT3.setClearColor( [ 0.0, 0.0, 0.0, 0.0 ] );
-
-
-            this._inputs = [ this._sceneTexture, this._sceneTexture1, this._sceneTexture2, this._sceneTexture3 ];
+            this._inputs = [ this._sceneTexture, this._sceneTexture1, this._sceneTexture2 ];
         },
 
         createFinalTexture: function () {
@@ -156,35 +132,25 @@
             st.setAttributeAndModes( program );
             st.addUniform( this._nearFarUnif );
 
-            // normal
-            st = this._cameraRTT1.getOrCreateStateSet();
-            program = this._helper.getShaderProgram( 'normal.vert', 'normal.frag', [
-                '#define _ViewDerivative'
-                //'#define _MeshNormalView'
-            ], false );
-            st.setAttributeAndModes( program );
+             this._cameraRTT2.removeChild( this._helper.backGround );
+            this._cameraRTT2.setClearColor( [ 0.0, 0.0, 0.0, 0.0 ] );
 
-            // reflection
-            st = this._cameraRTT3.getOrCreateStateSet();
+
+            st = this._cameraRTT2.getOrCreateStateSet();
             program = this._helper.getShaderProgram( 'refractVert', 'reflectOpt.frag', [], false );
             st.setAttributeAndModes( program );
-            st.addUniform( this._nearFarUnif );
 
             st.setTextureAttributeAndModes( 1, this._sceneTexture, osg.StateAttribute.ON | osg.StateAttribute.OVERRIDE );
             st.addUniform( osg.Uniform.createInt1( 1, 'Texture1' ) );
 
-
             st.setTextureAttributeAndModes( 2, this._sceneTexture1, osg.StateAttribute.ON | osg.StateAttribute.OVERRIDE );
             st.addUniform( osg.Uniform.createInt1( 2, 'Texture2' ) );
-
-            st.setTextureAttributeAndModes( 3, this._sceneTexture2, osg.StateAttribute.ON | osg.StateAttribute.OVERRIDE );
-
-            st.addUniform( osg.Uniform.createInt1( 3, 'Texture3' ) );
+            st.addUniform( this._nearFarUnif );
 
             var alphaBlendFilter = new osgUtil.Composer.Filter.Custom(
                 osgShader.ShaderProcessor.instance.getShader( 'add.frag' ), {
-                    'Texture3': this._sceneTexture2,
-                    'Texture4': this._sceneTexture3
+                    'Texture3': this._sceneTexture1,
+                    'Texture4': this._sceneTexture2
                 }
             );
 
@@ -201,7 +167,6 @@
             this._effectRoot.addChild( this._commonNode );
             this._effectRoot.addChild( this._commonNode1 );
             this._effectRoot.addChild( this._commonNode2 );
-            this._effectRoot.addChild( this._commonNode3 );
             this._effectRoot.addChild( this._composer );
         },
 

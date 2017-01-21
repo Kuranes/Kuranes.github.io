@@ -23,7 +23,7 @@
 
                 this._target._nearFarUnif.set( this._target._nearFar );
             }
-            return false;
+            return true;
         };
     };
 

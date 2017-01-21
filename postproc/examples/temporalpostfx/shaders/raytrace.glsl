@@ -105,7 +105,8 @@ bool traceScreenSpaceRay1(vec3            csOrigin,
                           float           maxSteps,
                           in float        maxRayTraceDistance,
                           out vec2        hitPixel,
-                          out vec3        csHitvec) {
+                          out vec3        csHitvec,
+                          vec4 projInfo) {
 
     // Clip ray to a near plane in 3D (doesn't have to be *the* near plane, although that would be a good idea)
     float rayLength = ((csOrigin.z + csDirection.z * maxRayTraceDistance) > nearPlaneZ) ?

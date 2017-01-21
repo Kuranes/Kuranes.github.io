@@ -58,6 +58,14 @@ vec3 reconstructNormalVS(const in vec3 positionVS)
     //return normalize(cross(dFdx(positionVS), dFdy(positionVS)));
 }
 
+//Convert something in camera space to screen space
+vec3 convertCameraSpaceToScreenSpace(const in vec3 cameraSpace, const in mat4 projectionMatrix)
+{
+  vec4 clipSpace = projectionMatrix * vec4(cameraSpace, 1);
+  vec3 NDCSpace = clipSpace.xyz / clipSpace.w;
+  vec3 screenSpace = 0.5 * NDCSpace + 0.5;
+  return screenSpace;
+}
 
 varying vec4 FragNormal;
 varying vec4 FragPosition;
@@ -66,7 +74,6 @@ varying vec2 FragTexCoord0;
 uniform sampler2D Texture0;
 uniform sampler2D Texture1;
 uniform sampler2D Texture2;
-uniform sampler2D Texture3;
 uniform samplerCube Texture6;
 
 uniform mat4 ProjectionMatrix;
@@ -91,9 +98,10 @@ void main (void)
     if (  screenZ > gl_FragCoord.z - 0.0001){
 
         //in
-        vec3 csOrigin = FragPosition.xyz;
-        vec3 csDirection = normalize(-FragNormal.xyz);
 
+        vec3 csOrigin = FragPosition.xyz;
+        vec3 csDirection = normalize(gl_FrontFacing ? FragNormal.xyz : -FragNormal.xyz );
+        
         //out
         vec2 hitPixel;
         int which;
@@ -106,17 +114,18 @@ void main (void)
                                         renderSize.xy,
                                         0.0001,
                                         clipInfo,
-                                        NearFar[0],
+                                        -NearFar[0],
                                         3.0,// stride step >= 1.0
                                         0.25, //jitterFraction 0-1.0
                                         250.0,//maxSteps,
-                                        NearFar[1],// maxRayTraceDistance
+                                        -NearFar[1],// maxRayTraceDistance
                                         hitPixel,
-                                        csHitvec);
+                                        csHitvec,
+                                        projInfo);
 
         if (hit){
             gl_FragColor.a = 1.0;
-            gl_FragColor.rgb = texture2D(Texture3, hitPixel).rgb;
+            gl_FragColor.rgb = texture2D(Texture2, hitPixel).rgb;
         }
         else{
             gl_FragColor.rgb = vec3(0.2,0.2,0.2);//reflection;//exture2D(Texture0, FragTexCoord0).rgb;

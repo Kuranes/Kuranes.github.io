@@ -247,7 +247,23 @@
 
 
                 modelTrans.addChild( loadedModel );
+                
+                var modelTrans2 = new osg.MatrixTransform();
+                modelTrans2.setName( 'ModelTrans2' );
+                osg.Matrix.makeScale( 1.5, 1.5, 1.5, modelTrans2.getMatrix() );
+                osg.Matrix.setTrans( modelTrans2.getMatrix(), 35.0, 35.0, 0.0 );
+                modelTrans2.addChild( loadedModel );
+                
+                modelTrans.addChild( modelTrans2 );
+                
 
+                var modelTrans3 = new osg.MatrixTransform();
+                modelTrans3.setName( 'ModelTrans3' );
+                osg.Matrix.makeScale( 1.5, 1.5, 1.5, modelTrans3.getMatrix() );
+                osg.Matrix.setTrans( modelTrans3.getMatrix(), 15.0, 15.0, -0.0 );
+                modelTrans3.addChild( loadedModel );
+                
+                modelTrans.addChild( modelTrans3 );
 
             } );
             modelTrans.getOrCreateStateSet().setTextureAttributeAndModes( 6, this._cubemapTexture );
@@ -826,8 +842,10 @@
 
                 }
             };
-
+            
             var filter0 = this._config[ 'filter0' ];
+            if (~~(filter0.indexOf('DepthPrecision'))) document.getElementById('descText').style.visibility = 'hidden';
+
             if ( !filter0 ) filter0 = this._globalGui.filter0;
             else this._globalGui.filter0 = filter0;
 
@@ -892,7 +910,8 @@
                     _self._quad.getOrCreateStateSet().setTextureAttributeAndModes( 0, _self._effect0.getOutputTexture() );
                     _self._quad.getOrCreateStateSet().setTextureAttributeAndModes( 1, _self._effect1.getOutputTexture() );
 
-                    node.traverse( nv );
+                    //node.traverse( nv );
+                    return true;
                 };
             };
             this._root.setUpdateCallback( new UpdateCallback() );
