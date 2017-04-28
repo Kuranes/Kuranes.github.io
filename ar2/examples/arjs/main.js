@@ -274,7 +274,7 @@ var main = function () {
     viewer.setupManipulator();
     viewer.run();
 
-    var modelURL = 'http://osgjs.org/examples/media/models/material-test/file.osgjs';
+    var modelURL = '../media/models/material-test/file.osgjs';
     var request = osgDB.readNodeURL( modelURL );
 
     request.then( function ( model ) {
