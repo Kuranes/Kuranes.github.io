@@ -1,0 +1,160 @@
+{
+  "Generator": "OpenSceneGraph 3.2.1", 
+  "Version": 7, 
+  "osg.Node": {
+    "Children": [ {
+      "osg.Node": {
+        "UniqueID": 0, 
+        "Name": "groot", 
+        "Children": [ {
+          "osg.Node": {
+            "UniqueID": 1, 
+            "Children": [ {
+              "osg.Geometry": {
+                "UniqueID": 2, 
+                "StateSet": {
+                  "osg.StateSet": {
+                    "UniqueID": 3, 
+                    "TextureAttributeList": [ [ {
+                      "osg.Texture": {
+                        "UniqueID": 5, 
+                        "File": "diff.jpg", 
+                        "MagFilter": "LINEAR", 
+                        "MinFilter": "LINEAR_MIPMAP_LINEAR", 
+                        "WrapS": "REPEAT", 
+                        "WrapT": "REPEAT"
+                      }
+                    } ] ], 
+                    "UserDataContainer": {
+                      "UniqueID": 4, 
+                      "Values": [ {
+                        "Name": "source", 
+                        "Value": "wavefront"
+                      },
+                      {
+                        "Name": "ka", 
+                        "Value": "[ 1, 0, 0]"
+                      },
+                      {
+                        "Name": "kd", 
+                        "Value": "[ 1, 1, 1]"
+                      },
+                      {
+                        "Name": "ks", 
+                        "Value": "[ 0, 0, 0]"
+                      },
+                      {
+                        "Name": "ns", 
+                        "Value": "0"
+                      },
+                      {
+                        "Name": "sharpness", 
+                        "Value": "0"
+                      },
+                      {
+                        "Name": "emissive", 
+                        "Value": "[ 0, 0, 0]"
+                      },
+                      {
+                        "Name": "tr", 
+                        "Value": "0"
+                      },
+                      {
+                        "Name": "map_kd", 
+                        "Value": "0"
+                      } ]
+                    }
+                  }
+                }, 
+                "PrimitiveSetList": [ {
+                  "DrawElementsUShort": {
+                    "UniqueID": 10, 
+                    "Indices": {
+                      "Array": { 
+                        "Uint16Array": { 
+                          "File": "model_file.bin.gz",
+                          "Size": 12249,
+                          "Offset": 0
+                        }
+                      }, 
+                      "ItemSize": 1, 
+                      "Type": "ELEMENT_ARRAY_BUFFER"
+                    }, 
+                    "Mode": "TRIANGLES"
+                  }
+                },
+                {
+                  "DrawElementsUShort": {
+                    "UniqueID": 11, 
+                    "Indices": {
+                      "Array": { 
+                        "Uint16Array": { 
+                          "File": "model_file.bin.gz",
+                          "Size": 79880,
+                          "Offset": 24500
+                        }
+                      }, 
+                      "ItemSize": 1, 
+                      "Type": "ELEMENT_ARRAY_BUFFER"
+                    }, 
+                    "Mode": "TRIANGLE_STRIP"
+                  }
+                } ], 
+                "VertexAttributeList": {
+                  "Normal": {
+                    "UniqueID": 7, 
+                    "Array": { 
+                      "Float32Array": { 
+                        "File": "model_file.bin.gz",
+                        "Size": 34236,
+                        "Offset": 184260
+                      }
+                    }, 
+                    "ItemSize": 3, 
+                    "Type": "ARRAY_BUFFER"
+                  }, 
+                  "Tangent": {
+                    "UniqueID": 9, 
+                    "Array": { 
+                      "Float32Array": { 
+                        "File": "model_file.bin.gz",
+                        "Size": 34236,
+                        "Offset": 595092
+                      }
+                    }, 
+                    "ItemSize": 4, 
+                    "Type": "ARRAY_BUFFER"
+                  }, 
+                  "TexCoord0": {
+                    "UniqueID": 8, 
+                    "Array": { 
+                      "Float32Array": { 
+                        "File": "model_file.bin.gz",
+                        "Size": 34236,
+                        "Offset": 1142868
+                      }
+                    }, 
+                    "ItemSize": 2, 
+                    "Type": "ARRAY_BUFFER"
+                  }, 
+                  "Vertex": {
+                    "UniqueID": 6, 
+                    "Array": { 
+                      "Float32Array": { 
+                        "File": "model_file.bin.gz",
+                        "Size": 34236,
+                        "Offset": 1416756
+                      }
+                    }, 
+                    "ItemSize": 3, 
+                    "Type": "ARRAY_BUFFER"
+                  }
+                }
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  }
+}
