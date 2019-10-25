@@ -1,6 +1,136 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800|Titillium+Web:400,300,200,600,700,900);
-@import "_base.css";
-@import "_app.css";
-@import "_loading.css";
-@import "_sidebar.css";
-@import "_viewer.css";
+
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+    font-size: 14px;
+    background: #fff;
+    font-family: 'Open Sans';
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Titillium Web';
+}
+
+a {
+    color: #1caad9;
+}
+
+.button {
+    display: inline-block;
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    padding: 0 13px;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: none;
+    text-transform: uppercase;
+    cursor: pointer;
+    outline: none;
+    -webkit-transition: background 0.2s;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background: #1caad9;
+    color: #fff;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background: #1c88bb;
+}
+
+.button.btn-large {
+    height: 45px;
+    line-height: 41px;
+}
+
+.app {
+    box-sizing: border-box;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    padding: 40px;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px;
+    border-radius: 6px;
+    background: #1caad9;
+    color: #fff;
+}
+
+.sidebar {
+    flex: 0 0 300px;
+    overflow: auto;
+    background: #fff;
+    margin-right: 40px;
+    border-radius: 6px;
+    box-shadow: 0 0px 1px rgba(0, 0, 0, 0.15), 0 3px 15px rgba(0, 0, 0, 0.15);
+}
+
+.main {
+    flex: 1 1 auto;
+    position: relative;
+    background: #aaa;
+    border-radius: 6px;
+    box-shadow: 0 0px 1px rgba(0, 0, 0, 0.15), 0 3px 15px rgba(0, 0, 0, 0.15);
+}
+
+.toolbar {
+    box-sizing: border-box;
+    height: 35px;
+    padding: 8px;
+    background: #fff;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.viewer {
+    position: absolute;
+    top: 35px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.viewer canvas {
+    display: block;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    width: 100%;
+    height: 100%;
+}
+
+.osgjsViewer {
+    width: 100%;
+    height: 100%;
+}
+
+.osgjsViewer__envs {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.osgjsViewer__envs img {
+    max-width: 96px;
+    height: auto;
+    margin: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+}
