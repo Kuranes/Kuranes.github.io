@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>GLTF PathTracer using Download API</title>
+        <link rel="stylesheet" href="style/app.css" />
+    </head>
+
+    <body>
+        <div class="app">
+            <div class="sidebar skfb-widget"></div>
+            <div class="main">
+                <div class="viewer" id="viewer"></div>
+            </div>
+        </div>
+
+        <div class="loading">
+            Waiting for model
+            <span class="loading__progress"></span>
+        </div>
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+        <!-- <script type="text/javascript" src="vendors/bluebird.js"></script>!-->
+        <script type="text/javascript" src="vendors/hammer.js"></script>
+        <script type="text/javascript" src="vendors/zipjs/zip.js"></script>
+        <script type="text/javascript" src="vendors/zipjs/zip-ext.js"></script>
+        <script type="text/javascript" src="vendors/zipjs/HttpProgressReader.js"></script>
+        <script
+            type="text/javascript"
+            src="https://apps.sketchfab.com/web-importer/sketchfab-importer.js"
+        ></script>
+
+        <script src="vendors/three.js"></script>
+        <script src="vendors/GLTFLoader.js"></script>
+        <script src="vendors/RGBELoader.js"></script>
+        <script src="vendors/EquirectangularToCubeGenerator.js"></script>
+        <script src="vendors/OrbitControls.js"></script>
+        <script src="vendors/stats.min.js"></script>
+        <script src="vendors/dat.gui.js"></script>
+        <script src="vendors/RayTracingRenderer.js"></script>
+
+        <script>
+            zip.workerScriptsPath = 'vendors/zipjs/';
+        </script>
+
+        <script type="text/javascript" src="js/Downloader.js"></script>
+        <script type="text/javascript" src="js/Search.js"></script>
+
+        <script type="text/javascript" src="js/pathtracer.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>
+    </body>
+</html>
